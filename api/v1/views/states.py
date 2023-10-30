@@ -26,7 +26,7 @@ def get_state(state_id):
 
 @app_views.route('/states/<path:state_id>', methods=['DELETE'],
                  strict_slashes=False)
-def delete_state(state_id):
+def delete(state_id):
     if state_id is None:
         abort(404)
     state = storage.get(State, state_id)
@@ -39,7 +39,7 @@ def delete_state(state_id):
 
 @app_views.route('/states', methods=['POST'],
                  strict_slashes=False)
-def post_state():
+def post():
     res = request.get_json()
     if type(res) != dict:
         return abort(400, {'message': 'Not a JSON'})
@@ -52,7 +52,7 @@ def post_state():
 
 @app_views.route('/states/<path:state_id>', methods=['PUT'],
                  strict_slashes=False)
-def put_state(state_id):
+def put(state_id):
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
