@@ -1,35 +1,37 @@
 #!/usr/bin/python3
-""" flask api app"""
+"""
+Endpoint (route) will be to return the status of your API
+"""
 
-from api.v1.views import app_views
-from flask import Flask, make_response, jsonify
+from flask import Flask, jsonify
+from os import getenv
 from flask_cors import CORS
 from models import storage
-import os
+from api.v1.views import app_views
 
 
 app = Flask(__name__)
-CORS(app, resources={"/api/*": {"origins": "0.0.0.0"}})
-app.url_map.strict_slashes = False
-CORS(app, resources={"/api/*": {"origins": "0.0.0.0"}})
 app.register_blueprint(app_views)
+cors = CORS(app, resources={r"/api/v1/*": {"origins": "0.0.0.0"}})
 
 
 @app.teardown_appcontext
-def tearDown(self):
-    """ TearDown function"""
-    storage.close()
+def teardown(self):
+    """
+    teardown fubction to call storage.close()
+    """
+    return storage.close()
 
 
 @app.errorhandler(404)
-def notFound(error):
-    """NotFound function"""
-    return make_response(jsonify({'error': 'Not found'}), 404)
+def error(e):
+    """
+    404 http error
+    """
+    return jsonify({"error": "Not found"}), 404
 
 
-if __name__ == "__main__":
-    if os.getenv("HBNB_API_HOST") and os.getenv("HBNB_API_PORT"):
-        app.run(host=os.getenv("HBNB_API_HOST"),
-                port=os.getenv("HBNB_API_PORT"), threaded=True)
-    else:
-        app.run(host='0.0.0.0', port=5000, threaded=True)
+if __name__ == '__main__':
+    host = getenv("HBNB_API_HOST") if getenv("HBNB_API_HOST") else "0.0.0.0"
+    port = getenv("HBNB_API_PORT") if getenv("HBNB_API_PORT") else 5000
+    app.run(host=host, port=port, threaded=True)
